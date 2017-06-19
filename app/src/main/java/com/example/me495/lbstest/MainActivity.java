@@ -90,11 +90,12 @@ public class MainActivity extends AppCompatActivity {
             permissionList.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if (!permissionList.isEmpty()) {
-            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
-        } else {
-            mLocationClient.start();
         }
+        mLocationClient.start();
+        Log.d("locationClient","start");
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("onclicklocation","ok");
                 requestLocation();
             }
         });
@@ -212,13 +214,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestLocation() {
-
+        LatLng latLng;
+        synchronized (MainActivity.class) {
+            latLng = new LatLng(ll.latitude, ll.longitude);
+        }
+        Log.d("requestLocation","start");
         baiduMap.clear();
-        MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(ll,18);
+        Log.d("requestLocation","clear");
+        MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(latLng,15);
+        Log.d("requestLocation",Double.valueOf(latLng.latitude).toString());
         baiduMap.animateMapStatus(update);
-        DotOptions option = new DotOptions().center(ll).color(Color.rgb(0x1e,0x90,0xff)).radius(15);
-        option.center(ll).color(Color.BLUE);
+        DotOptions option = new DotOptions().center(latLng).color(Color.rgb(0x1e,0x90,0xff)).radius(15);
+        Log.d("requestLocation",String.valueOf(latLng.latitude) + ", " + String.valueOf(latLng.longitude));
+        //option.center(latLng).color(Color.BLUE);
         baiduMap.addOverlay(option);
+        Log.d("requestLocation","end");
     }
 
     @Override
@@ -257,6 +267,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 ll = new LatLng(location.getLatitude(), location.getLongitude());
             }
+            if(ll == null) Log.d("Debugll","null");
+            else Log.d("Debugll","notnull");
 //            MapStatusUpdate update = MapStatusUpdateFactory.newLatLngZoom(ll,18);
 //            baiduMap.animateMapStatus(update);
 //            BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.blue_mark);
